@@ -3,6 +3,8 @@ from django.views import View
 from django.contrib import messages
 from .models import Product,Customer,Cart,OrderPlaced
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.contrib import auth
 
 # def home(request):
 #  return render(request, 'app/home.html')
@@ -57,6 +59,26 @@ class CustomerRegistration(View):
             messages.error(request,'Password did not match')
             return redirect('customerregistration')
 
+class Login(View):
+    def get(self,request):
+        return render(request,'app/login.html',)
+    def post(self,request):
+        username=request.POST['username']
+        password=request.POST['password']
+
+        user=auth.authenticate(username=username,password=password)
+        if user is not None:
+            auth.login(request,user)
+            return redirect('product')
+        else:
+            return HttpResponse('Invalid Credentials')
+
+def logout(request):
+    auth.logout(request)
+    return redirect('product')
+
+
+
 
 
  
@@ -81,8 +103,7 @@ def change_password(request):
 
 
 
-def login(request):
- return render(request, 'app/login.html')
+
 
 
 
