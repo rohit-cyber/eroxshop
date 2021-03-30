@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.views import View
+from django.contrib import messages
 from .models import Product,Customer,Cart,OrderPlaced
+from django.contrib.auth.models import User
 
 # def home(request):
 #  return render(request, 'app/home.html')
@@ -32,6 +34,33 @@ def mobile(request,data=None):
         product=Product.objects.filter(category='M').filter(discounted_price__lt=500)
     return render(request, 'app/mobile.html',{'product':product})
 
+
+class CustomerRegistration(View):
+    def get(self,request):
+        return render(request, 'app/customerregistration.html')
+    
+    def post(self,request):
+        username=request.POST['username']
+        email=request.POST['email']
+        password=request.POST['password']
+        password2=request.POST['password2']
+        if password==password2:
+            if User.objects.filter(email=email).exists():
+                messages.error(request,'email already exists')
+                return redirect('customerregistration')
+            else:
+                user=User.objects.create_user(username=username,email=email,password=password)
+                user.save()
+                messages.success(request,'you have successfully registered')
+                return redirect('login')
+        else:
+            messages.error(request,'Password did not match')
+            return redirect('customerregistration')
+
+
+
+ 
+
 def add_to_cart(request):
  return render(request, 'app/addtocart.html')
 
@@ -55,8 +84,7 @@ def change_password(request):
 def login(request):
  return render(request, 'app/login.html')
 
-def customerregistration(request):
- return render(request, 'app/customerregistration.html')
+
 
 def checkout(request):
  return render(request, 'app/checkout.html')
