@@ -5,6 +5,7 @@ from .models import Product,Customer,Cart,OrderPlaced
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib import auth
+from .forms import CustomerForm
 
 # def home(request):
 #  return render(request, 'app/home.html')
@@ -78,6 +79,22 @@ def logout(request):
     return redirect('product')
 
 
+class CustomerProfile(View):
+    def get(self,request):
+        form=CustomerForm()
+        return render(request,'app/profile.html',{'form':form,'active':'btn-primary'})
+    def post(self,request):
+        form=CustomerForm(request.POST)
+        if form.is_valid():
+            usr=request.user
+            name=form.cleaned_data['name']
+            locality=form.cleaned_data['locality']
+            city=form.cleaned_data['city']
+            state=form.cleaned_data['state']
+            zipcode=form.cleaned_data['zipcode']
+            reg=Customer(user=usr,name=name,locality=locality,city=city,state=state,zipcode=zipcode)
+            reg.save()
+        return redirect('product')
 
 
 
